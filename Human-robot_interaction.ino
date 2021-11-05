@@ -45,9 +45,9 @@ void loop() {
     
     // Stage 3 --> Run the program
         if(actualStage == 3) {
-          stage3();
-          delay(200);
           Serial.println("Im in stage 3!");
+          stage3(commandSelected);
+          delay(200);
         }
 
   
@@ -193,7 +193,7 @@ void stage1() {
            beep();
            accCountsR -= 100;
            if (speedSelected > 400) speedSelected = 50;
-         } else if (accCountsR < 100) {
+         } else if (accCountsR < -100) {
             speedSelected -= 50;
             beep();
             accCountsR += 100;
@@ -223,7 +223,7 @@ void stage2() {
         beep();
         accCountsR -= 100;
         if (timeSelected > 15) timeSelected = 1;
-    } else if (accCountsR < 100) {
+    } else if (accCountsR < -100) {
         timeSelected -= 1;
         beep();
         accCountsR += 100;
@@ -240,31 +240,35 @@ void stage2() {
     }
 }
 
-void stage3() {
+void stage3(int command) {
   // run the command
 
-  switch (commandSelected) {
+  switch (command) {
     case 0:
+    Serial.println("Case 0");
     motors.setSpeeds(speedSelected,speedSelected);
-    delay(timeSelected);
+    delay(timeSelected * 1000);
     motors.setSpeeds(0,0);
     break;
     
     case 1:
+    Serial.println("Case 1");
     motors.setSpeeds(-speedSelected,-speedSelected);
-    delay(timeSelected);
+    delay(timeSelected * 1000);
     motors.setSpeeds(0,0);
     break;
 
     case 2:
+    Serial.println("Case 2");
     motors.setSpeeds(-speedSelected,speedSelected);
-    delay(timeSelected);
+    delay(timeSelected * 1000);
     motors.setSpeeds(0,0);
     break;
 
     case 3:
+    Serial.println("Case 3");
     motors.setSpeeds(speedSelected,-speedSelected);
-    delay(timeSelected);
+    delay(timeSelected * 1000);
     motors.setSpeeds(0,0);
     break;
 
@@ -276,6 +280,13 @@ void stage3() {
     lcd.print("WRONG!!!");
   }
 
+  // Reset the encoder
+  accCountsR = encoders.getCountsAndResetRight();
+  accCountsR = 0;
+
+  //Add a delay before next command
+  delay(300);
+  
   //Set the actualStage to 0, to reset the program
   actualStage = 0;
   
